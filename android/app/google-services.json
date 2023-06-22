@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "108694722458",
+    "project_id": "ggg2023-34789",
+    "storage_bucket": "ggg2023-34789.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:108694722458:android:4d4a8f867b3f42984e8c23",
+        "android_client_info": {
+          "package_name": "org.tensorflow.lite.examples.facerecognition"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "108694722458-6flbk9hvutrmkuua8ils548asp9v6utm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSH46kpm3ZJjJy8BmFqJy4S9QsvYI2sec"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "108694722458-6flbk9hvutrmkuua8ils548asp9v6utm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
