@@ -28,7 +28,9 @@ class ListViewModel(val firebaseProvider: FirebaseProvider) : ViewModel() {
 
     private fun getData() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(list = firebaseProvider.getEmployees(), isLoading = false)
+            firebaseProvider.employeesFlow.collect {
+                _uiState.value = _uiState.value.copy(list = it, isLoading = false)
+            }
         }
     }
 
