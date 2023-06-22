@@ -2,4 +2,8 @@
     <string name="tfe_od_app_name">Uncheșii</string>
     <string name="tfe_od_camera_error" translation_description="Error regarding camera support[CHAR_LIMIT=40]">This device doesn\'t support Camera2 API.</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="add_new_employee">Add new employee:</string>
+    <string name="employee_name">Employee name:</string>
+    <string name="cancel">Cancel</string>
+    <string name="add">Add</string>
 </resources>

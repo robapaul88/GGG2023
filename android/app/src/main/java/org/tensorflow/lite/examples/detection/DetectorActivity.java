@@ -29,16 +29,19 @@ import android.graphics.Typeface;
 import android.hardware.camera2.CameraCharacteristics;
 import android.media.ImageReader.OnImageAvailableListener;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Size;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 
@@ -367,26 +370,55 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         LayoutInflater inflater = getLayoutInflater();
         View dialogLayout = inflater.inflate(R.layout.image_edit_dialog, null);
         ImageView ivFace = dialogLayout.findViewById(R.id.dlg_image);
-        TextView tvTitle = dialogLayout.findViewById(R.id.dlg_title);
         EditText etName = dialogLayout.findViewById(R.id.dlg_input);
 
-        tvTitle.setText("Add Face");
         ivFace.setImageBitmap(rec.getCrop());
-        etName.setHint("Input name");
 
-        builder.setPositiveButton("OK", (dlg, i) -> {
-            String name = etName.getText().toString();
-            if (name.isEmpty()) {
+        builder.setView(dialogLayout);
+        builder.setCancelable(false);
+        AlertDialog dialog = builder.show();
+        dialog.setCanceledOnTouchOutside(false);
+
+        dialogLayout.findViewById(R.id.dlg_cancel).setOnClickListener(v -> dialog.dismiss());
+        Button add = dialogLayout.findViewById(R.id.dlg_add);
+        etName.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override public void afterTextChanged(Editable s) {
+                add.setEnabled(!s.toString().isEmpty());
+            }
+        });
+        add.setOnClickListener(v -> {
+            String name = etName.getText().toString().trim();
+            if (!isValid(name)) {
+                Toast.makeText(this, "Provide full name!", Toast.LENGTH_SHORT).show();
                 return;
             }
             FirebaseProvider.INSTANCE.savePerson(name, rec.getCrop());
             detector.register(name, rec);
             //knownFaces.put(name, rec);
-            dlg.dismiss();
+            dialog.dismiss();
         });
-        builder.setView(dialogLayout);
-        builder.show();
+    }
 
+    private boolean isValid(@Nullable String name) {
+        if (name == null || name.isEmpty()) {
+            return false;
+        }
+        String[] splits = name.split(" ");
+        if (splits.length < 2) {
+            return false;
+        }
+        for (String split : splits) {
+            if (split.trim().isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void updateResults(long currTimestamp, final List<SimilarityClassifier.Recognition> mappedRecognitions) {
