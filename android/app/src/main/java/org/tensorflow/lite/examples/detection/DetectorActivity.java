@@ -79,10 +79,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
 
     private static final String TF_OD_API_LABELS_FILE = "file:///android_asset/labelmap.txt";
-
-    private static final DetectorMode MODE = DetectorMode.TF_OD_API;
-    // Minimum detection confidence to track a detection.
-    private static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.5f;
     private static final boolean MAINTAIN_ASPECT = false;
 
     private static final Size DESIRED_PREVIEW_SIZE = new Size(640, 480);
@@ -239,19 +235,11 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         cropToFrameTransform = new Matrix();
         frameToCropTransform.invert(cropToFrameTransform);
 
-
         trackingOverlay = findViewById(R.id.tracking_overlay);
-        trackingOverlay.addCallback(
-                canvas -> {
-                    tracker.draw(canvas);
-                    if (isDebug()) {
-                        tracker.drawDebug(canvas);
-                    }
-                });
+        trackingOverlay.addCallback(canvas -> tracker.draw(canvas));
 
         tracker.setFrameConfiguration(previewWidth, previewHeight, sensorOrientation);
     }
-
 
     @Override
     protected void processImage() {
@@ -303,23 +291,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     protected Size getDesiredPreviewFrameSize() {
         return DESIRED_PREVIEW_SIZE;
     }
-
-    // Which detection model to use: by default uses Tensorflow Object Detection API frozen
-    // checkpoints.
-    private enum DetectorMode {
-        TF_OD_API;
-    }
-
-    @Override
-    protected void setUseNNAPI(final boolean isChecked) {
-        runInBackground(() -> detector.setUseNNAPI(isChecked));
-    }
-
-    @Override
-    protected void setNumThreads(final int numThreads) {
-        runInBackground(() -> detector.setNumThreads(numThreads));
-    }
-
 
     // Face Processing
     private Matrix createTransform(
@@ -427,24 +398,13 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     private void onFacesDetected(long currTimestamp, List<Face> faces, boolean add) {
 
-        Bitmap cropCopyBitmap = Bitmap.createBitmap(croppedBitmap);
         final Paint paint = new Paint();
         paint.setColor(Color.RED);
         paint.setStyle(Style.STROKE);
         paint.setStrokeWidth(2.0f);
 
-        float minimumConfidence = MINIMUM_CONFIDENCE_TF_OD_API;
-        switch (MODE) {
-            case TF_OD_API:
-                minimumConfidence = MINIMUM_CONFIDENCE_TF_OD_API;
-                break;
-        }
-
         final List<SimilarityClassifier.Recognition> mappedRecognitions =
                 new LinkedList<>();
-
-
-        //final List<Classifier.Recognition> results = new ArrayList<>();
 
         // Note this can be done only once
         int sourceW = rgbFrameBitmap.getWidth();
@@ -471,8 +431,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
             final RectF boundingBox = new RectF(face.getBoundingBox());
 
-            final boolean goodConfidence = true; //result.getConfidence() >= minimumConfidence;
-
             // maps crop coordinates to original
             cropToFrameTransform.mapRect(boundingBox);
 
@@ -495,11 +453,15 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
             Bitmap crop = null;
 
             if (add) {
-                crop = Bitmap.createBitmap(portraitBmp,
-                        (int) faceBB.left,
-                        (int) faceBB.top,
-                        (int) faceBB.width(),
-                        (int) faceBB.height());
+                try {
+                    crop = Bitmap.createBitmap(portraitBmp,
+                            (int) faceBB.left,
+                            (int) faceBB.top,
+                            (int) faceBB.width(),
+                            (int) faceBB.height());
+                } catch (IllegalArgumentException iex) {
+                    LOGGER.e("onFacesDetected IAE:" + iex);
+                }
             }
 
             final List<SimilarityClassifier.Recognition> resultsAux = detector.recognizeImage(faceBmp, add);

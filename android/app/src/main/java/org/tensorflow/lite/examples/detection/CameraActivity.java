@@ -19,7 +19,6 @@ package org.tensorflow.lite.examples.detection;
 import android.Manifest;
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.hardware.camera2.CameraAccessException;
@@ -300,13 +299,13 @@ public abstract class CameraActivity extends AppCompatActivity
 
     // Returns true if the device supports the required hardware level, or better.
     private boolean isHardwareLevelSupported(
-            CameraCharacteristics characteristics, int requiredLevel) {
+            CameraCharacteristics characteristics) {
         int deviceLevel = characteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
         if (deviceLevel == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY) {
-            return requiredLevel == deviceLevel;
+            return false;
         }
         // deviceLevel is not LEGACY, can use numerical sort
-        return requiredLevel <= deviceLevel;
+        return android.hardware.camera2.CameraMetadata.INFO_SUPPORTED_HARDWARE_LEVEL_FULL <= deviceLevel;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M) private String chooseCamera() {
@@ -314,11 +313,8 @@ public abstract class CameraActivity extends AppCompatActivity
         final CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
 
         try {
-
-
             for (final String cameraId : manager.getCameraIdList()) {
                 final CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
-
 
                 final StreamConfigurationMap map =
                         characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
@@ -328,18 +324,17 @@ public abstract class CameraActivity extends AppCompatActivity
                 }
 
                 final Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
-
-                if (useFacing != null &&
-                        facing != null &&
-                        !facing.equals(useFacing)
-                ) {
+                if (facing == null) {
                     continue;
                 }
 
+                if (useFacing != null && !facing.equals(useFacing)) {
+                    continue;
+                }
 
                 useCamera2API = (CameraCharacteristics.LENS_FACING_EXTERNAL == facing)
                         || isHardwareLevelSupported(
-                        characteristics, CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL);
+                        characteristics);
 
 
                 LOGGER.i("Camera API lv2?: %s", useCamera2API);
@@ -352,7 +347,6 @@ public abstract class CameraActivity extends AppCompatActivity
         return null;
     }
 
-
     protected void setFragment() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -363,13 +357,10 @@ public abstract class CameraActivity extends AppCompatActivity
         if (useCamera2API) {
             CameraConnectionFragment camera2Fragment =
                     CameraConnectionFragment.newInstance(
-                            new CameraConnectionFragment.ConnectionCallback() {
-                                @Override
-                                public void onPreviewSizeChosen(final Size size, final int rotation) {
-                                    previewHeight = size.getHeight();
-                                    previewWidth = size.getWidth();
-                                    CameraActivity.this.onPreviewSizeChosen(size, rotation);
-                                }
+                            (size, rotation) -> {
+                                previewHeight = size.getHeight();
+                                previewWidth = size.getWidth();
+                                CameraActivity.this.onPreviewSizeChosen(size, rotation);
                             },
                             this,
                             getLayoutId(),
@@ -383,11 +374,16 @@ public abstract class CameraActivity extends AppCompatActivity
             int facing = (useFacing == CameraCharacteristics.LENS_FACING_BACK) ?
                     Camera.CameraInfo.CAMERA_FACING_BACK :
                     Camera.CameraInfo.CAMERA_FACING_FRONT;
-            LegacyCameraConnectionFragment frag = new LegacyCameraConnectionFragment(this,
-                    getLayoutId(),
-                    getDesiredPreviewFrameSize(), facing);
-            fragment = frag;
-
+            fragment = new LegacyCameraConnectionFragment();
+            Bundle bundle = new Bundle();
+            bundle.putInt(LegacyCameraConnectionFragment.LAYOUT_ID, getLayoutId());
+            Size size = getDesiredPreviewFrameSize();
+            if (size != null) {
+                bundle.putInt(LegacyCameraConnectionFragment.SIZE_WIDTH, size.getWidth());
+                bundle.putInt(LegacyCameraConnectionFragment.SIZE_HEIGHT, size.getHeight());
+            }
+            bundle.putInt(LegacyCameraConnectionFragment.KEY_FACING, facing);
+            fragment.setArguments(bundle);
         }
 
         getFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
@@ -404,11 +400,6 @@ public abstract class CameraActivity extends AppCompatActivity
             }
             buffer.get(yuvBytes[i]);
         }
-    }
-
-    public boolean isDebug() {
-        boolean debug = false;
-        return debug;
     }
 
     protected void readyForNextImage() {
@@ -430,15 +421,6 @@ public abstract class CameraActivity extends AppCompatActivity
         }
     }
 
-    protected void showFrameInfo(String frameInfo) {
-    }
-
-    protected void showCropInfo(String cropInfo) {
-    }
-
-    protected void showInference(String inferenceTime) {
-    }
-
     protected abstract void processImage();
 
     protected abstract void onPreviewSizeChosen(final Size size, final int rotation);
@@ -446,8 +428,4 @@ public abstract class CameraActivity extends AppCompatActivity
     protected abstract int getLayoutId();
 
     protected abstract Size getDesiredPreviewFrameSize();
-
-    protected abstract void setNumThreads(int numThreads);
-
-    protected abstract void setUseNNAPI(boolean isChecked);
 }
