@@ -22,7 +22,6 @@ class ListViewModel(val firebaseProvider: FirebaseProvider) : ViewModel() {
     val uiState: StateFlow<EmployeeListUiState> = _uiState
 
     init {
-        println("merepere init viewmodel")
         getData()
     }
 

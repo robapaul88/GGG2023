@@ -49,7 +49,7 @@ object FirebaseProvider {
                 if (snapshot.exists()) {
                     val list = mutableListOf<EmployeeData>()
                     snapshot.children.forEach { data ->
-                        list.add(dataMapper(data))
+                        list.add(0, dataMapper(data))
                     }
                     Log.d("FirebaseProvider", "getEmployees onDataChange: $list")
                     trySend(list)

@@ -11,5 +11,7 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 val NightBackground = Color(0xFF111316)
-val NightSurface = Color(0xFF2B2C31)
-val DayBackground = Color(0xFFAAA5A5)
+val NightSurface = Color(0xFF212329)
+val DayBackground = Color(0xFFE9E9E9)
+
+val DayFontColor = Color(0x002D2D2D)
