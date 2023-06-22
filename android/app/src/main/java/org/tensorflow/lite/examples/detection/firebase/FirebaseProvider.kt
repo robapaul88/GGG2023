@@ -19,7 +19,7 @@ object FirebaseProvider {
     private const val DATA_ID = "ID"
     private const val DATA_NAME = "Name"
     private const val DATA_IMAGE = "Image"
-    private const val TIMESTAMP = "Timestamp"
+    private const val LAST_SEEN_AT = "LastSeenAt"
 
     fun saveEmployee(name: String, faceImage: Bitmap) {
         val peopleNrReference = firebaseDatabase.getReference(PEOPLE_NUMBER).child(DATA_ID)
@@ -33,7 +33,7 @@ object FirebaseProvider {
                     newPersonReference.child(DATA_ID).setValue(currentId)
                     newPersonReference.child(DATA_NAME).setValue(name)
                     newPersonReference.child(DATA_IMAGE).setValue(encodedBitmap)
-                    newPersonReference.child(TIMESTAMP).setValue(System.currentTimeMillis())
+                    newPersonReference.child(LAST_SEEN_AT).setValue(System.currentTimeMillis())
 
                     peopleNrReference.setValue(currentId + 1)
                 }
@@ -68,8 +68,9 @@ object FirebaseProvider {
     }
 
     fun clearDatabase() {
-        firebaseDatabase.getReference(EMPLOYEES).removeValue()
-        firebaseDatabase.getReference(PEOPLE_NUMBER).removeValue()
+        firebaseDatabase.getReference(EMPLOYEES).setValue(null)
+        firebaseDatabase.getReference(PEOPLE_NUMBER).setValue(null)
+        firebaseDatabase.getReference(PEOPLE_NUMBER).child(DATA_ID).setValue(0L)
     }
 
     private fun dataMapper(data: DataSnapshot): EmployeeData {
@@ -80,7 +81,7 @@ object FirebaseProvider {
                 photo = BitmapConverter.convertStringToBitmap(
                     child(DATA_IMAGE).value as? String ?: ""
                 ),
-                timestamp = child(TIMESTAMP).value as? Long ?: 0L
+                timestamp = child(LAST_SEEN_AT).value as? Long ?: 0L
             )
         }
     }

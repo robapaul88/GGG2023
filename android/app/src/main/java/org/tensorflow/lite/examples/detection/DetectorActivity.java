@@ -47,9 +47,7 @@ import androidx.core.content.ContextCompat;
 
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.face.Face;
-import com.google.mlkit.vision.face.FaceDetection;
 import com.google.mlkit.vision.face.FaceDetector;
-import com.google.mlkit.vision.face.FaceDetectorOptions;
 
 import org.tensorflow.lite.examples.detection.customview.OverlayView;
 import org.tensorflow.lite.examples.detection.env.BorderedText;
@@ -88,8 +86,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     OverlayView trackingOverlay;
     private Integer sensorOrientation;
 
-    private SimilarityClassifier detector;
-
     private Bitmap rgbFrameBitmap = null;
     private Bitmap croppedBitmap = null;
 
@@ -103,9 +99,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     //private Matrix cropToPortraitTransform;
 
     private MultiBoxTracker tracker;
-
-    // Face detector
-    private FaceDetector faceDetector;
 
     // here the preview image is drawn in portrait way
     private Bitmap portraitBmp = null;
@@ -121,18 +114,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         super.onCreate(savedInstanceState);
 
         findViewById(R.id.fab_add).setOnClickListener(view -> onAddClick());
-
-
-        // Real-time contour detection of multiple faces
-        FaceDetectorOptions options =
-                new FaceDetectorOptions.Builder()
-                        .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
-                        .setContourMode(FaceDetectorOptions.LANDMARK_MODE_NONE)
-                        .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_NONE)
-                        .build();
-
-
-        faceDetector = FaceDetection.getClient(options);
     }
 
 
@@ -182,13 +163,12 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
 
         try {
-            detector =
-                    TFLiteObjectDetectionAPIModel.create(
-                            getAssets(),
-                            TF_OD_API_MODEL_FILE,
-                            TF_OD_API_LABELS_FILE,
-                            TF_OD_API_INPUT_SIZE,
-                            TF_OD_API_IS_QUANTIZED);
+            updateDetector(TFLiteObjectDetectionAPIModel.create(
+                    getAssets(),
+                    TF_OD_API_MODEL_FILE,
+                    TF_OD_API_LABELS_FILE,
+                    TF_OD_API_INPUT_SIZE,
+                    TF_OD_API_IS_QUANTIZED));
             //cropSize = TF_OD_API_INPUT_SIZE;
         } catch (final IOException e) {
             e.printStackTrace();
@@ -268,7 +248,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         }
 
         InputImage image = InputImage.fromBitmap(croppedBitmap, 0);
-        faceDetector
+        getFaceDetector()
                 .process(image)
                 .addOnSuccessListener(faces -> {
                     if (faces.size() == 0) {
@@ -280,6 +260,18 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 });
 
 
+    }
+
+    private FaceDetector getFaceDetector() {
+        return ((GGGApplication) getApplicationContext()).getFaceDetector();
+    }
+
+    private void updateDetector(SimilarityClassifier similarityClassifier) {
+        ((GGGApplication) getApplicationContext()).updateDetector(similarityClassifier);
+    }
+
+    private SimilarityClassifier getDetector() {
+        return ((GGGApplication) getApplicationContext()).getDetector();
     }
 
     @Override
@@ -358,7 +350,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 return;
             }
             FirebaseProvider.INSTANCE.saveEmployee(name, rec.getCrop());
-            detector.register(name, rec);
+            getDetector().register(name, rec);
             //knownFaces.put(name, rec);
             dialog.dismiss();
         });
@@ -464,7 +456,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 }
             }
 
-            final List<SimilarityClassifier.Recognition> resultsAux = detector.recognizeImage(faceBmp, add);
+            final List<SimilarityClassifier.Recognition> resultsAux = getDetector().recognizeImage(faceBmp, add);
 
             if (resultsAux.size() > 0) {
 
