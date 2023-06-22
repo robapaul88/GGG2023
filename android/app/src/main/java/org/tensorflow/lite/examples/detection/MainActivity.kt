@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.tensorflow.lite.examples.detection.firebase.FirebaseProvider
 import org.tensorflow.lite.examples.detection.ui.theme.AndroidTheme
+import org.tensorflow.lite.examples.detection.utils.ClearDbWithConfirmation
 import java.lang.RuntimeException
 
 class MainActivity : ComponentActivity() {
@@ -57,14 +58,7 @@ fun ContentScreen() {
                     }) {
                     Text(text = "List")
                 }
-                Button(modifier = Modifier
-                    .align(CenterHorizontally)
-                    .padding(16.dp),
-                    onClick = {
-                        FirebaseProvider.clearDatabase()
-                    }) {
-                    Text(text = "Clear Database")
-                }
+                ClearDbWithConfirmation()
             }
         }
     }
