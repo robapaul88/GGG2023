@@ -52,6 +52,7 @@ import org.tensorflow.lite.examples.detection.customview.OverlayView;
 import org.tensorflow.lite.examples.detection.env.BorderedText;
 import org.tensorflow.lite.examples.detection.env.ImageUtils;
 import org.tensorflow.lite.examples.detection.env.Logger;
+import org.tensorflow.lite.examples.detection.firebase.FirebaseProvider;
 import org.tensorflow.lite.examples.detection.tflite.SimilarityClassifier;
 import org.tensorflow.lite.examples.detection.tflite.TFLiteObjectDetectionAPIModel;
 import org.tensorflow.lite.examples.detection.tracking.MultiBoxTracker;
@@ -381,6 +382,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
             if (name.isEmpty()) {
                 return;
             }
+            FirebaseProvider.INSTANCE.savePerson(name, rec.getCrop());
             detector.register(name, rec);
             //knownFaces.put(name, rec);
             dlg.dismiss();
