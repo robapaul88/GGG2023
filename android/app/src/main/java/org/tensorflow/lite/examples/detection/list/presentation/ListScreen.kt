@@ -117,7 +117,7 @@ fun EmployeeItem(data: EmployeeData) {
     }
 }
 
-fun formatDate(timestamp: Long): CharSequence = android.text.format.DateFormat.format("dd MM, yyyy at hh:mm:ss a", Date(timestamp))
+fun formatDate(timestamp: Long): CharSequence = android.text.format.DateFormat.format("dd MM, yyyy - hh:mm:ss a", Date(timestamp))
 
 @Composable
 fun AppToolbarText(text: String) {
