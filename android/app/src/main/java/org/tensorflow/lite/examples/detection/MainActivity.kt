@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.tensorflow.lite.examples.detection.firebase.FirebaseProvider
 import org.tensorflow.lite.examples.detection.ui.theme.AndroidTheme
 import java.lang.RuntimeException
 
@@ -60,9 +61,9 @@ fun ContentScreen() {
                     .align(CenterHorizontally)
                     .padding(16.dp),
                     onClick = {
-                        throw RuntimeException("Intentional crash!")
+                        FirebaseProvider.clearDatabase()
                     }) {
-                    Text(text = "Crash")
+                    Text(text = "Clear Database")
                 }
             }
         }

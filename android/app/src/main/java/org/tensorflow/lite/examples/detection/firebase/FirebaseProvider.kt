@@ -65,6 +65,11 @@ object FirebaseProvider {
         awaitClose { }
     }
 
+    fun clearDatabase() {
+        firebaseDatabase.getReference(EMPLOYEES).removeValue()
+        firebaseDatabase.getReference(PEOPLE_NUMBER).removeValue()
+    }
+
     private fun dataMapper(data: DataSnapshot): EmployeeData {
         data.apply {
             return EmployeeData(
