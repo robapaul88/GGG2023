@@ -70,8 +70,7 @@ public abstract class CameraActivity extends AppCompatActivity
     private Runnable postInferenceCallback;
     private Runnable imageConverter;
 
-    private static final String KEY_USE_FACING = "use_facing";
-    private Integer useFacing = CameraCharacteristics.LENS_FACING_BACK;
+    public final Integer useFacing = CameraCharacteristics.LENS_FACING_FRONT;
     private String cameraId = null;
 
     protected Integer getCameraFacing() {
@@ -83,10 +82,6 @@ public abstract class CameraActivity extends AppCompatActivity
     protected void onCreate(final Bundle savedInstanceState) {
         LOGGER.d("onCreate " + this);
         super.onCreate(null);
-
-        Intent intent = getIntent();
-        //useFacing = intent.getIntExtra(KEY_USE_FACING, CameraCharacteristics.LENS_FACING_FRONT);
-        useFacing = intent.getIntExtra(KEY_USE_FACING, CameraCharacteristics.LENS_FACING_BACK);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 

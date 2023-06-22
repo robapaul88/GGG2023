@@ -457,7 +457,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
             }
 
-            if (getCameraFacing() == CameraCharacteristics.LENS_FACING_FRONT) {
+            if (useFacing == CameraCharacteristics.LENS_FACING_FRONT) {
 
                 // camera is frontal so the image is flipped horizontally
                 // flips horizontally
