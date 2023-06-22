@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,9 +17,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.tensorflow.lite.examples.detection.firebase.FirebaseProvider
 import org.tensorflow.lite.examples.detection.ui.theme.AndroidTheme
 import org.tensorflow.lite.examples.detection.utils.ClearDbWithConfirmation
@@ -48,7 +51,7 @@ fun ContentScreen() {
                     onClick = {
                         context.startActivity(Intent(context, DetectorActivity::class.java))
                     }) {
-                    Text(text = "Camera")
+                    Text(color = Color.Black, text = "Camera", fontSize = 22.sp)
                 }
                 Button(modifier = Modifier
                     .align(CenterHorizontally)
@@ -56,7 +59,7 @@ fun ContentScreen() {
                     onClick = {
                         context.startActivity(ListActivity.getIntent(context))
                     }) {
-                    Text(text = "List")
+                    Text(color = Color.Black, text = "List", fontSize = 22.sp)
                 }
                 ClearDbWithConfirmation()
             }

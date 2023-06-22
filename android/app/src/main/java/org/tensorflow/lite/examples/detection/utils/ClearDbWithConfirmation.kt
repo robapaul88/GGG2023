@@ -9,7 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.tensorflow.lite.examples.detection.firebase.FirebaseProvider
 
 @Composable
@@ -24,7 +26,7 @@ fun ClearDbWithConfirmation() {
             onClick = {
                 openDialog.value = true
             }) {
-            Text(text = "Clear Database")
+            Text(color = Color.Black, text = "Clear Database", fontSize = 22.sp)
         }
 
         if (openDialog.value) {
