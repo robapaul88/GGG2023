@@ -70,7 +70,7 @@ import java.util.concurrent.Executor;
  * objects.
  */
 public class DetectorActivity extends CameraActivity implements OnImageAvailableListener {
-    private static final Logger LOGGER = new Logger();
+    private static final Logger LOGGER = new Logger("DETECTOR");
 
     // MobileFaceNet
     private static final int TF_OD_API_INPUT_SIZE = 112;
@@ -99,7 +99,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     private boolean computingDetection = false;
     private boolean addPending = false;
-    //private boolean adding = false;
 
     private long timestamp = 0;
 
@@ -118,12 +117,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     private Bitmap faceBmp = null;
 
     //private HashMap<String, Classifier.Recognition> knownFaces = new HashMap<>();
-
-    private Executor executor;
     private BiometricPrompt biometricPrompt;
-    private BiometricPrompt.PromptInfo promptInfo;
-
-    private Boolean isUserAuthorized = false;
 
 
     @Override
@@ -147,35 +141,32 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
 
     private void onAddClick() {
-        executor = ContextCompat.getMainExecutor(this);
+        Executor executor = ContextCompat.getMainExecutor(this);
         biometricPrompt = new BiometricPrompt(DetectorActivity.this,
                 executor, new BiometricPrompt.AuthenticationCallback() {
             @Override
             public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
                 super.onAuthenticationError(errorCode, errString);
-                isUserAuthorized = false;
                 biometricPrompt.cancelAuthentication();
-                Toast.makeText(getApplicationContext(),
-                                "Not authorized" + errString, Toast.LENGTH_SHORT)
-                        .show();
+                addPending = false;
+                Toast.makeText(getApplicationContext(), "Not authorized to add faces!", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
-                processImage(true);
+                addPending = true;
             }
 
             @Override
             public void onAuthenticationFailed() {
                 super.onAuthenticationFailed();
+                addPending = false;
                 biometricPrompt.cancelAuthentication();
-                Toast.makeText(getApplicationContext(), "Not authorized",
-                                Toast.LENGTH_SHORT)
-                        .show();
+                Toast.makeText(getApplicationContext(), "Not authorized to add faces!", Toast.LENGTH_SHORT).show();
             }
         });
-        promptInfo = new BiometricPrompt.PromptInfo.Builder()
+        BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
                 .setTitle("Biometric authentication")
                 .setSubtitle("Log in using your biometric credential")
                 .setNegativeButtonText("TBD")
@@ -263,7 +254,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
 
     @Override
-    protected void processImage(boolean addPending) {
+    protected void processImage() {
         ++timestamp;
         final long currTimestamp = timestamp;
         trackingOverlay.postInvalidate();
@@ -297,10 +288,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                         return;
                     }
                     runInBackground(
-                            () -> {
-                                onFacesDetected(currTimestamp, faces, addPending);
-//                                addPending = false;
-                            });
+                            () -> onFacesDetected(currTimestamp, faces, addPending));
                 });
 
 
@@ -432,6 +420,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
             SimilarityClassifier.Recognition rec = mappedRecognitions.get(0);
             if (rec.getExtra() != null) {
                 showAddFaceDialog(rec);
+                addPending = false;
             }
         }
     }
