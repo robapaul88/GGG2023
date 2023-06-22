@@ -169,7 +169,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
                 .setTitle("Biometric authentication")
                 .setSubtitle("Log in using your biometric credential")
-                .setNegativeButtonText("TBD")
+                .setNegativeButtonText(getString(R.string.cancel))
                 .build();
         biometricPrompt.authenticate(promptInfo);
     }
