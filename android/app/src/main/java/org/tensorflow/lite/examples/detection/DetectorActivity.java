@@ -38,6 +38,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.biometric.BiometricPrompt;
+import androidx.core.content.ContextCompat;
+
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.face.Face;
 import com.google.mlkit.vision.face.FaceDetection;
@@ -55,6 +59,7 @@ import org.tensorflow.lite.examples.detection.tracking.MultiBoxTracker;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 /**
  * An activity that uses a TensorFlowMultiBoxDetector and ObjectTracker to detect and then track
@@ -110,12 +115,19 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     //private HashMap<String, Classifier.Recognition> knownFaces = new HashMap<>();
 
+    private Executor executor;
+    private BiometricPrompt biometricPrompt;
+    private BiometricPrompt.PromptInfo promptInfo;
+
+    private Boolean isUserAuthorized = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         findViewById(R.id.fab_add).setOnClickListener(view -> onAddClick());
+
 
         // Real-time contour detection of multiple faces
         FaceDetectorOptions options =
@@ -131,8 +143,43 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
 
     private void onAddClick() {
-        addPending = true;
-        //TODO add fingerprint validation
+
+        executor = ContextCompat.getMainExecutor(this);
+        biometricPrompt = new BiometricPrompt(DetectorActivity.this,
+                executor, new BiometricPrompt.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
+                super.onAuthenticationError(errorCode, errString);
+                isUserAuthorized = false;
+                addPending = false;
+                Toast.makeText(getApplicationContext(),
+                                "Authentication error: " + errString, Toast.LENGTH_SHORT)
+                        .show();
+            }
+
+            @Override
+            public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
+                super.onAuthenticationSucceeded(result);
+                addPending = true;
+                Toast.makeText(getApplicationContext(),
+                        "Authentication succeeded!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                super.onAuthenticationFailed();
+                addPending = false;
+                Toast.makeText(getApplicationContext(), "Authentication failed",
+                                Toast.LENGTH_SHORT)
+                        .show();
+            }
+        });
+        promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Biometric authentication")
+                .setSubtitle("Log in using your biometric credential")
+                .setNegativeButtonText("TBD")
+                .build();
+        biometricPrompt.authenticate(promptInfo);
     }
 
     @Override
