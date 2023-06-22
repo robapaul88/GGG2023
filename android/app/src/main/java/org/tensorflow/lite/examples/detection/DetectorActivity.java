@@ -144,7 +144,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
 
     private void onAddClick() {
-
         executor = ContextCompat.getMainExecutor(this);
         biometricPrompt = new BiometricPrompt(DetectorActivity.this,
                 executor, new BiometricPrompt.AuthenticationCallback() {
@@ -152,25 +151,23 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
             public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
                 super.onAuthenticationError(errorCode, errString);
                 isUserAuthorized = false;
-                addPending = false;
+                biometricPrompt.cancelAuthentication();
                 Toast.makeText(getApplicationContext(),
-                                "Authentication error: " + errString, Toast.LENGTH_SHORT)
+                                "Not authorized" + errString, Toast.LENGTH_SHORT)
                         .show();
             }
 
             @Override
             public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
-                addPending = true;
-                Toast.makeText(getApplicationContext(),
-                        "Authentication succeeded!", Toast.LENGTH_SHORT).show();
+                processImage(true);
             }
 
             @Override
             public void onAuthenticationFailed() {
                 super.onAuthenticationFailed();
-                addPending = false;
-                Toast.makeText(getApplicationContext(), "Authentication failed",
+                biometricPrompt.cancelAuthentication();
+                Toast.makeText(getApplicationContext(), "Not authorized",
                                 Toast.LENGTH_SHORT)
                         .show();
             }
@@ -263,7 +260,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
 
     @Override
-    protected void processImage() {
+    protected void processImage(boolean addPending) {
         ++timestamp;
         final long currTimestamp = timestamp;
         trackingOverlay.postInvalidate();
@@ -299,7 +296,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                     runInBackground(
                             () -> {
                                 onFacesDetected(currTimestamp, faces, addPending);
-                                addPending = false;
+//                                addPending = false;
                             });
                 });
 

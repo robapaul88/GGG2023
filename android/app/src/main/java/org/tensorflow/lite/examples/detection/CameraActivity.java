@@ -144,7 +144,7 @@ public abstract class CameraActivity extends AppCompatActivity
                     camera.addCallbackBuffer(bytes);
                     isProcessingFrame = false;
                 };
-        processImage();
+//        processImage();
     }
 
     /**
@@ -196,7 +196,7 @@ public abstract class CameraActivity extends AppCompatActivity
                         isProcessingFrame = false;
                     };
 
-            processImage();
+//            processImage();
         } catch (final Exception e) {
             LOGGER.e(e, "Exception!");
             Trace.endSection();
@@ -439,7 +439,7 @@ public abstract class CameraActivity extends AppCompatActivity
     protected void showInference(String inferenceTime) {
     }
 
-    protected abstract void processImage();
+    protected abstract void processImage(boolean addPending);
 
     protected abstract void onPreviewSizeChosen(final Size size, final int rotation);
 
