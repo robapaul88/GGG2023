@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.tensorflow.lite.examples.detection.firebase.FirebaseProvider
 
-class ListViewModel(val firebaseProvider: FirebaseProvider) : ViewModel() {
+class ListViewModel(private val firebaseProvider: FirebaseProvider) : ViewModel() {
 
     data class EmployeeListUiState(
         val list: List<EmployeeData> = mutableListOf(),
@@ -31,6 +31,10 @@ class ListViewModel(val firebaseProvider: FirebaseProvider) : ViewModel() {
                 _uiState.value = _uiState.value.copy(list = it, isLoading = false)
             }
         }
+    }
+
+    fun deleteEmployee(id: Long) {
+        firebaseProvider.removeEmployee(id.toString())
     }
 
     companion object {

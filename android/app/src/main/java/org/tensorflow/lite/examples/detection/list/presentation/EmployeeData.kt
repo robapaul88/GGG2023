@@ -3,6 +3,7 @@ package org.tensorflow.lite.examples.detection.list.presentation
 import android.graphics.Bitmap
 
 data class EmployeeData (
+    val id: Long?,
     val firstName: String,
     val lastName: String,
     val photo: Bitmap?,

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -26,7 +27,7 @@ fun ClearDbWithConfirmation() {
             onClick = {
                 openDialog.value = true
             }) {
-            Text(color = Color.Black, text = "Clear Database", fontSize = 22.sp)
+            Text(color = MaterialTheme.colorScheme.onPrimary, text = "Clear Database", fontSize = 22.sp)
         }
 
         if (openDialog.value) {

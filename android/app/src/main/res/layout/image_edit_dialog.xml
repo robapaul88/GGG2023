@@ -11,6 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginVertical="8dp"
         android:text="@string/add_new_employee"
         android:textSize="20sp" />
 
@@ -26,11 +27,12 @@
 
     <EditText
         android:id="@+id/dlg_input"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:hint="@string/employee_name"
-        tools:hint="The dialog hint" />
+        android:gravity="center"
+        android:hint="@string/GGG"
+        android:layout_marginVertical="16dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -40,18 +42,22 @@
         <Button
             android:id="@+id/dlg_cancel"
             android:layout_width="0dp"
+            android:background="@drawable/button_background"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_weight="1"
+            android:textColor="@android:color/white"
             android:text="@string/cancel" />
 
         <Button
             android:id="@+id/dlg_add"
             android:layout_width="0dp"
+            android:background="@drawable/button_background"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_weight="1"
             android:enabled="false"
+            android:textColor="@android:color/white"
             android:text="@string/add" />
     </LinearLayout>
 

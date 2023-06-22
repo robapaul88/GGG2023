@@ -73,9 +73,22 @@ object FirebaseProvider {
         firebaseDatabase.getReference(PEOPLE_NUMBER).child(DATA_ID).setValue(0L)
     }
 
+    fun removeEmployee(id: String) {
+        firebaseDatabase.getReference(EMPLOYEES).child(id).setValue(null)
+        firebaseDatabase.getReference(PEOPLE_NUMBER).child(DATA_ID).get().addOnSuccessListener {
+            if (it.exists()) {
+                val currentNr = it.value as? Long
+                if (currentNr != null) {
+                    firebaseDatabase.getReference(PEOPLE_NUMBER).child(DATA_ID).setValue(currentNr - 1)
+                }
+            }
+        }
+    }
+
     private fun dataMapper(data: DataSnapshot): EmployeeData {
         data.apply {
             return EmployeeData(
+                id = child(DATA_ID).value as? Long,
                 firstName = child(DATA_NAME).value as? String ?: "",
                 lastName = child(DATA_NAME).value as? String ?: "",
                 photo = BitmapConverter.convertStringToBitmap(
