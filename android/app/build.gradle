@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'de.undercouch.download'
 apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     namespace 'org.tensorflow.lite.examples.detection'
@@ -47,6 +48,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.9.0'
     implementation('org.tensorflow:tensorflow-lite:0.0.0-nightly') { changing = true }
     implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'com.google.firebase:firebase-database:20.1.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
     androidTestImplementation 'com.google.truth:truth:1.0.1'
