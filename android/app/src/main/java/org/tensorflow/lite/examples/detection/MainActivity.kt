@@ -52,11 +52,10 @@ fun ContentScreen() {
                     .align(CenterHorizontally)
                     .padding(16.dp),
                     onClick = {
-                        context.startActivity(Intent(context, DetectorActivity::class.java))
+                        context.startActivity(ListActivity.getIntent(context))
                     }) {
                     Text(text = "List")
                 }
-
                 Button(modifier = Modifier
                     .align(CenterHorizontally)
                     .padding(16.dp),

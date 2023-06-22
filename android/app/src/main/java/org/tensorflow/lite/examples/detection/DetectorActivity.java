@@ -386,7 +386,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 Toast.makeText(this, "Provide full name!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            FirebaseProvider.INSTANCE.savePerson(name, rec.getCrop());
+            FirebaseProvider.INSTANCE.saveEmployee(name, rec.getCrop());
             detector.register(name, rec);
             //knownFaces.put(name, rec);
             dialog.dismiss();
