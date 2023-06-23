@@ -13,7 +13,7 @@ class ListViewModel(private val firebaseProvider: FirebaseProvider) : ViewModel(
 
     data class EmployeeListUiState(
         val list: List<EmployeeData> = mutableListOf(),
-        val isLoading: Boolean = true
+        val isLoading: Boolean = true,
     )
 
     private val _uiState: MutableStateFlow<EmployeeListUiState> = MutableStateFlow(

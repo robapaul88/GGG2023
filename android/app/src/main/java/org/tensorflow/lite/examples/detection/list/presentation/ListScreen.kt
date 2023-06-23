@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -73,51 +72,67 @@ fun ListScreen(viewModel: ListViewModel, onScreenClose: () -> Unit) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
         } else {
-            LazyColumn(
-                contentPadding = PaddingValues(
-                    top = paddingValues.calculateTopPadding() + 16.dp, bottom = 24.dp
-                ),
-                modifier = Modifier.padding(horizontal = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                stickyHeader {
-                    Box(
-                        modifier = Modifier
-                            .background(
-                                color = MaterialTheme.colorScheme.primary.copy(0.7f),
-                                shape = RoundedCornerShape(16.dp)
-                            )
-                            .padding(8.dp)
-                    ) {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = "Total: ${state.list.size}",
-                            style = MaterialTheme.typography.labelLarge,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
+            if (state.list.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background.copy(alpha = 0.3f))
+                ) {
+                    Text(
+                        modifier = Modifier.align(Alignment.Center),
+                        text = "No employees",
+                        style = MaterialTheme.typography.headlineLarge,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
                 }
-                item {
-                    Column(
-                        modifier = Modifier
-                            .background(
-                                color = MaterialTheme.colorScheme.surface,
-                                shape = RoundedCornerShape(4.dp)
-                            )
-                            .padding(horizontal = 16.dp)
-                    ) {
-                        state.list.forEachIndexed { index, employee ->
-                            EmployeeItem(data = employee, onDelete = {
-                                if (it != null) {
-                                    viewModel.deleteEmployee(it)
-                                }
-                            })
-                            if (index != state.list.size - 1) {
-                                Divider(
-                                    thickness = 1.dp,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(0.2f)
+            } else {
+                LazyColumn(
+                    contentPadding = PaddingValues(
+                        top = paddingValues.calculateTopPadding() + 16.dp, bottom = 24.dp
+                    ),
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    stickyHeader {
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    color = MaterialTheme.colorScheme.primary.copy(0.7f),
+                                    shape = RoundedCornerShape(16.dp)
                                 )
+                                .padding(8.dp)
+                        ) {
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = "Total: ${state.list.size}",
+                                style = MaterialTheme.typography.labelLarge,
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                    }
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .background(
+                                    color = MaterialTheme.colorScheme.surface,
+                                    shape = RoundedCornerShape(4.dp)
+                                )
+                                .padding(horizontal = 16.dp)
+                        ) {
+                            state.list.forEachIndexed { index, employee ->
+                                EmployeeItem(data = employee, onDelete = {
+                                    if (it != null) {
+                                        viewModel.deleteEmployee(it)
+                                    }
+                                })
+                                if (index != state.list.size - 1) {
+                                    Divider(
+                                        thickness = 1.dp,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(0.2f)
+                                    )
+                                }
                             }
                         }
                     }
@@ -202,14 +217,20 @@ fun DetailsDialog(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Button(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .padding(end = 5.dp)
+                            .weight(1f), onClick = onDismiss
+                    ) {
+                        Text(text = "Cancel", color = MaterialTheme.colorScheme.onPrimary)
+                    }
+                    Button(
+                        modifier = Modifier
+                            .padding(start = 5.dp)
+                            .weight(1f),
                         onClick = onDelete,
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer)
                     ) {
                         Text(text = "Delete", color = MaterialTheme.colorScheme.onError)
-                    }
-                    Button(modifier = Modifier.weight(1f), onClick = onDismiss) {
-                        Text(text = "Cancel", color = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
 

@@ -10,6 +10,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import org.tensorflow.lite.examples.detection.list.presentation.EmployeeData
 import org.tensorflow.lite.examples.detection.utils.BitmapConverter
+import java.lang.Long.max
 
 object FirebaseProvider {
     private val firebaseDatabase: FirebaseDatabase = FirebaseDatabase.getInstance()
@@ -55,6 +56,8 @@ object FirebaseProvider {
                     }
                     Log.d("FirebaseProvider", "getEmployees onDataChange: $list")
                     trySend(list)
+                } else {
+                    trySend(mutableListOf())
                 }
             }
 
@@ -78,9 +81,7 @@ object FirebaseProvider {
         firebaseDatabase.getReference(PEOPLE_NUMBER).child(DATA_ID).get().addOnSuccessListener {
             if (it.exists()) {
                 val currentNr = it.value as? Long
-                if (currentNr != null) {
-                    firebaseDatabase.getReference(PEOPLE_NUMBER).child(DATA_ID).setValue(currentNr - 1)
-                }
+                firebaseDatabase.getReference(PEOPLE_NUMBER).child(DATA_ID).setValue(currentNr?.let { max(currentNr - 1, 0) } ?: 0)
             }
         }
     }
